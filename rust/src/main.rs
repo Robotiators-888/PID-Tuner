@@ -1,10 +1,10 @@
 use mathcore::MathCore;
 
-const startingError: i32 = 10;
-const P: f64 = 3.8;
-const I: f64 = 0.7;
-const D: f64 = 0.3;
-const lastValDampener: f64 = -0.3;
+const targetPos: f64 = 10.0;
+const P: f64 = 3.0;
+const I: f64 = 0.0;
+const D: f64 = 0.0;
+const lastValDampener: f64 = 0.7;
 
 fn print_type<T>(_x: &T) {
     println!("{}", std::any::type_name::<T>());
@@ -18,7 +18,7 @@ fn main() {
     println!("{}", otherIntegral);
     println!("{}", integral);
     let mut prevVal: f64 = 0.0;
-    for i in 0..20 {
+    for _i in 0..20 {
         println!("PID: {}", PID(0, prevVal));
         println!("Error: {}", Error(0, prevVal));
         prevVal = PID(0, prevVal);
@@ -49,5 +49,6 @@ fn PID(x: i32, prevVal: f64) -> f64 {
 }
 
 fn Error(x: i32, prevVal: f64) -> f64 {
-    (prevVal * lastValDampener) + startingError as f64
+    let result = targetPos - (prevVal * lastValDampener);
+    result
 }
