@@ -19,7 +19,8 @@ fn main() {
     println!("{}", integral);
     let mut prevVal: f64 = 0.0;
     for i in 0..20 {
-        println!("{}", PID(0, prevVal));
+        println!("PID: {}", PID(0, prevVal));
+        println!("Error: {}", Error(0, prevVal));
         prevVal = PID(0, prevVal);
     }
 }
