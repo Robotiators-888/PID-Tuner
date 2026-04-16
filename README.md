@@ -4,4 +4,5 @@ The vision: you go to advantagescope test with a very high P value to get oscill
 Then do the same with a low P\
 Give the P values and csv's to the program and it will give you a PID that gets it from one point to another or one speed to another ASAP\
 This is great for things that spin like a flywheel that need to get up to speed very fast\
-It is also great for things like an arm that needs to get from one position to another quickly and effectively
+It is also great for things like an arm that needs to get from one position to another quickly and effectively\
+Click [here](PID-info.md) for PID info
