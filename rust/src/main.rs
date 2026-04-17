@@ -4,8 +4,8 @@ use PIDController::pidController;
 
 const targetPos: f64 = 10.0;
 const P: f64 = 3.0;
-const I: f64 = 0.0;
-const D: f64 = 0.0;
+const I: f64 = 0.1;
+const D: f64 = 0.005;
 const lastValDampener: f64 = 0.7;
 
 fn print_type<T>(_x: &T) {

@@ -17,8 +17,8 @@ pub struct pidController {
 impl pidController {
   pub fn new(Kp:f64, Ki:f64, Kd:f64, period: Option<u64>) -> pidController {
     match period {
-      Some(v) => pidController{Kp:Kp,Ki:Ki,Kd:Kd,period:Duration::from_secs(v),prevError:0.0,error:0.0,totalError:0.0,minimumIntegral:1.0,maximumIntegral:-1.0},
-      None => pidController{Kp:Kp,Ki:Ki,Kd:Kd,period:Duration::from_secs(20),prevError:0.0,error:0.0,totalError:0.0,minimumIntegral:1.0,maximumIntegral:-1.0}
+      Some(v) => pidController{Kp:Kp,Ki:Ki,Kd:Kd,period:Duration::from_secs(v),prevError:0.0,error:0.0,totalError:0.0,minimumIntegral:-1.0,maximumIntegral:1.0},
+      None => pidController{Kp:Kp,Ki:Ki,Kd:Kd,period:Duration::from_secs(20),prevError:0.0,error:0.0,totalError:0.0,minimumIntegral:-1.0,maximumIntegral:1.0}
     }
   }
   pub fn calculate(&mut self, measurement:f64, setpoint:f64) -> f64 {
