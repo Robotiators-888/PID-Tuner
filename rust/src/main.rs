@@ -1,6 +1,6 @@
-mod PIDController;
+mod pidcontroller;
 use mathcore::MathCore;
-use PIDController::pidController;
+use pidcontroller::PIDController;
 
 const TARGETPOS: f64 = 10.0;
 const P: f64 = 3.0;
@@ -13,7 +13,7 @@ fn print_type<T>(_x: &T) {
 }
 
 fn main() {
-    let mut pidc = pidController::new(P, I, D, None);
+    let mut pidc = PIDController::new(P, I, D, None);
     let integral = MathCore::numerical_integrate("x^2", "x", 0.0, 1.0).unwrap();
     let other_integral = MathCore::integrate("2*x", "x").unwrap();
     print_type(&other_integral);
