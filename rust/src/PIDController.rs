@@ -24,7 +24,7 @@ impl PIDController {
   pub fn calculate(&mut self, measurement:f64, setpoint:f64) -> f64 {
     self.prevError = self.error;
     self.error = setpoint - measurement;
-    // ErrorDerivative is part of the class in wpilib and not a local variable but there seems to be no reason
+    // errorDerivative is part of the class in wpilib and not a local variable but there seems to be no reason for that
     let errorDerivative = (self.error - self.prevError) / self.period.as_secs();
     // Idk how this would be possible
     if self.error.abs() > f64::INFINITY {
