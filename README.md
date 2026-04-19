@@ -1,5 +1,5 @@
 # PID-Tuner
-A tool for FRC teams that reads two sets encoder data and returns a tuned PID\
+A tool for FRC teams that reads two sets of encoder data and returns a tuned PID\
 The vision: you go to advantagescope test with a very high P value to get oscillation then export the graph\
 Then do the same with a low P\
 Give the P values and csv's to the program and it will give you a PID that gets it from one point to another or one speed to another ASAP\
