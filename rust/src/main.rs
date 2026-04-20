@@ -13,8 +13,11 @@ fn main() {
     let stdout = io::stdout().lock();
     let mut writer = BufWriter::new(stdout);
     let mut pidc = PIDController::new(P, I, D, None);
-    for i in 0..20 {
-        let _ = writeln!(writer, "{}", pidc.calculate(i as f64, TARGETPOS));
+    let mut current_pos: f64 = 0.0;
+    for _i in 0..20 {
+        let calculation = pidc.calculate(current_pos, TARGETPOS);
+        println!("Calculation: {}\nPosition: {}", &calculation, &current_pos);
+        current_pos += calculation/10.0;
     }
     let _ = writer.flush();
 }
