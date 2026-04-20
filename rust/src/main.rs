@@ -16,7 +16,7 @@ fn main() {
     let mut current_pos: f64 = 0.0;
     for _i in 0..20 {
         let calculation = pidc.calculate(current_pos, TARGETPOS);
-        println!("Calculation: {}\nPosition: {}", &calculation, &current_pos);
+        let _ = writeln!(writer, "Calculation: {}\nPosition: {}", &calculation, &current_pos);
         current_pos += calculation/10.0;
     }
     let _ = writer.flush();
