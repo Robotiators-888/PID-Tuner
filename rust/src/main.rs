@@ -14,10 +14,15 @@ fn main() {
     let mut writer = BufWriter::new(stdout);
     let mut pidc = PIDController::new(P, I, D, None);
     let mut current_pos: f64 = 0.0;
-    for _i in 0..20 {
+    let mut attempts: i64 = 0;
+    for _i in 0..200 {
         let calculation = pidc.calculate(current_pos, TARGETPOS);
         let _ = writeln!(writer, "Calculation: {}\nPosition: {}", &calculation, &current_pos);
         current_pos += calculation/10.0;
+        if current_pos!=TARGETPOS {
+            attempts += 1;
+        }
     }
     let _ = writer.flush();
+    println!("Attempts: {}", attempts);
 }
