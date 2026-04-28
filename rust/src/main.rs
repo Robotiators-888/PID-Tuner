@@ -5,9 +5,9 @@ use std::io::{self, BufWriter, Write};
 use pidcontroller::PIDController;
 
 const TARGETPOS: f64 = 10.0;
-const P: f64 = 3.0;
-const I: f64 = 0.1;
-const D: f64 = 0.005;
+const P: f64 = 10.0;
+const I: f64 = 0.4;
+const D: f64 = 0.05;
 
 fn main() {
     let stdout = io::stdout().lock();
@@ -15,11 +15,15 @@ fn main() {
     let mut pidc = PIDController::new(P, I, D, None);
     let mut current_pos: f64 = 0.0;
     let mut attempts: i64 = 0;
-    for _i in 0..200 {
+    for _i in 0..100 {
         let calculation = pidc.calculate(current_pos, TARGETPOS);
-        let _ = writeln!(writer, "Calculation: {}\nPosition: {}", &calculation, &current_pos);
-        current_pos += calculation/10.0;
-        if current_pos!=TARGETPOS {
+        let _ = writeln!(
+            writer,
+            "Calculation: {}\nPosition: {}",
+            &calculation, &current_pos
+        );
+        current_pos += calculation / 10.0;
+        if current_pos != TARGETPOS {
             attempts += 1;
         }
     }
