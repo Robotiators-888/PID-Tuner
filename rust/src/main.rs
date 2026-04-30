@@ -1,9 +1,16 @@
-mod pidcontroller;
+mod pid;
 
 // Most beautiful use to ever exist
-use std::{thread, sync::{Arc, Mutex}, io::{self, BufWriter, Write}};
+use std::{
+    io::{self, BufWriter, Write},
+    sync::{Arc, Mutex},
+    thread,
+};
 
-use pidcontroller::PIDController;
+use pid::{
+    controller::PIDController,
+    tuner::{PID, tunePID},
+};
 
 const TARGETPOS: f64 = 10.0;
 const P: f64 = 10.0;
@@ -15,7 +22,12 @@ fn main() {
     let _threads = thread::available_parallelism()
         .map(|n| n.get())
         .unwrap_or(1_usize); // Super idiomatic _usize
-    let _pid: Arc<Mutex<PID>> = Arc::new(Mutex::new(PID{P:P,I:I,D:D,attempts:0}));
+    let _pid: Arc<Mutex<PID>> = Arc::new(Mutex::new(PID {
+        P: P,
+        I: I,
+        D: D,
+        attempts: 0,
+    }));
     let stdout = io::stdout().lock();
     let mut writer = BufWriter::new(stdout);
     let mut pidc = PIDController::new(P, I, D, None);
@@ -35,70 +47,18 @@ fn main() {
     }
     let _ = writer.flush();
     println!("Attempts: {}", attempts);
-    println!("Tuned PID: {:?}", tunePID(&PID{P:0.0,I:0.0,D:0.0,attempts:100}, TARGETPOS, 200, |pos, out| {pos+out/10.0}));
-}
-
-// I might actually need to use a PID to tune the PID
-#[allow(non_snake_case)]
-fn tunePID(best_PID: &PID, target: f64, attempts: u64, simfunc: fn (pos: f64, pid_output: f64) -> f64) -> PID {
-    let mut current_PID: PID = PID::clone(best_PID);
-    let mut last_attempt = best_PID.attempts;
-    let mut P_tune_val = 1.0;
-    let mut I_tune_val = 0.05;
-    let mut D_tune_val = 0.001;
-    for _ in 0..attempts {
-        current_PID.P += P_tune_val;
-        let result = simulate_attempts(&current_PID, target, simfunc, 100);
-        if result > last_attempt {
-            current_PID.P -= P_tune_val;
-            P_tune_val /= 10.0;
-        }
-        let result = simulate_attempts(&current_PID, target, simfunc, 100);
-        last_attempt = result;
-        // Just ignore D for now
-    }
-    for _ in 0..attempts {
-        current_PID.I += I_tune_val;
-        let result = simulate_attempts(&current_PID, target, simfunc, 100);
-        if result > last_attempt {
-            current_PID.I -= I_tune_val;
-            I_tune_val /= 10.0;
-        }
-        let result = simulate_attempts(&current_PID, target, simfunc, 100);
-        last_attempt = result;
-    }
-    for _ in 0..attempts {
-        current_PID.D += D_tune_val;
-        let result = simulate_attempts(&current_PID, target, simfunc, 100);
-        if result > last_attempt {
-            current_PID.D -= D_tune_val;
-            D_tune_val /= 10.0;
-        }
-        let result = simulate_attempts(&current_PID, target, simfunc, 100);
-        last_attempt = result;
-    }
-    current_PID.attempts = last_attempt;
-    current_PID
-}
-
-fn simulate_attempts (pid: &PID, target: f64, simfunc: fn (pos: f64, pid_output: f64) -> f64, repetitions: u64) -> u64 {
-    let mut pidc = PIDController::new(pid.P, pid.I, pid.D, None);
-    let mut attempts: u64 = 0;
-    let mut pos: f64 = 0.0;
-    for _ in 0..repetitions {
-        pos = simfunc(pos, pidc.calculate(pos, target));
-        if pos != target {
-            attempts += 1;
-        }
-    }
-    attempts
-}
-
-#[allow(non_snake_case)]
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-pub struct PID {
-    pub P: f64,
-    pub I: f64,
-    pub D: f64,
-    pub attempts: u64
+    println!(
+        "Tuned PID: {:?}",
+        tunePID(
+            &PID {
+                P: 0.0,
+                I: 0.0,
+                D: 0.0,
+                attempts: 100
+            },
+            TARGETPOS,
+            200,
+            |pos, out| { pos + out / 10.0 }
+        )
+    );
 }
