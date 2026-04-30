@@ -43,16 +43,21 @@ fn main() {
 fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
     let mut current_PID: PID = PID::clone(best_PID);
     let mut last_attempt = best_PID.attempts;
+    let mut P_tune_val = 1.0;
+    let mut I_tune_val = 0.05;
+    let mut _D_tune_val = 0.0;
     for _ in 0..attempts {
-        current_PID.P += 1.0;
+        current_PID.P += P_tune_val;
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
         if result > last_attempt {
-            current_PID.P -= 1.0;
+            current_PID.P -= P_tune_val;
+            P_tune_val /= 10.0;
         }
-        current_PID.I += 0.05;
+        current_PID.I += I_tune_val;
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
         if result > last_attempt {
-            current_PID.I -= 0.05;
+            current_PID.I -= I_tune_val;
+            I_tune_val /= 10.0;
         }
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
         last_attempt = result;
