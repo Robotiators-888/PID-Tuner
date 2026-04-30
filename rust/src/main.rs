@@ -35,12 +35,12 @@ fn main() {
     }
     let _ = writer.flush();
     println!("Attempts: {}", attempts);
-    println!("Tuned PID: {:?}", tunePID(&PID{P:0.0,I:0.0,D:0.0,attempts:100}, TARGETPOS, 200));
+    println!("Tuned PID: {:?}", tunePID(&PID{P:0.0,I:0.0,D:0.0,attempts:100}, TARGETPOS, 200, |pos, out| {pos+out/10.0}));
 }
 
 // I might actually need to use a PID to tune the PID
 #[allow(non_snake_case)]
-fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
+fn tunePID(best_PID: &PID, target: f64, attempts: u64, simfunc: fn (pos: f64, pid_output: f64) -> f64) -> PID {
     let mut current_PID: PID = PID::clone(best_PID);
     let mut last_attempt = best_PID.attempts;
     let mut P_tune_val = 1.0;
@@ -48,33 +48,33 @@ fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
     let mut D_tune_val = 0.001;
     for _ in 0..attempts {
         current_PID.P += P_tune_val;
-        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        let result = simulate_attempts(&current_PID, target, simfunc, 100);
         if result > last_attempt {
             current_PID.P -= P_tune_val;
             P_tune_val /= 10.0;
         }
-        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        let result = simulate_attempts(&current_PID, target, simfunc, 100);
         last_attempt = result;
         // Just ignore D for now
     }
     for _ in 0..attempts {
         current_PID.I += I_tune_val;
-        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        let result = simulate_attempts(&current_PID, target, simfunc, 100);
         if result > last_attempt {
             current_PID.I -= I_tune_val;
             I_tune_val /= 10.0;
         }
-        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        let result = simulate_attempts(&current_PID, target, simfunc, 100);
         last_attempt = result;
     }
     for _ in 0..attempts {
         current_PID.D += D_tune_val;
-        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        let result = simulate_attempts(&current_PID, target, simfunc, 100);
         if result > last_attempt {
             current_PID.D -= D_tune_val;
             D_tune_val /= 10.0;
         }
-        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        let result = simulate_attempts(&current_PID, target, simfunc, 100);
         last_attempt = result;
     }
     current_PID.attempts = last_attempt;
