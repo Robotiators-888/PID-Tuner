@@ -35,37 +35,7 @@ fn main() {
     }
     let _ = writer.flush();
     println!("Attempts: {}", attempts);
-    println!("Tuned PID: {:?}", tunePID(&PID{P:P,I:I,D:D,attempts}, TARGETPOS, 200));
-    println!("Meta Tuned PID: {:?}", metaTunePID(TARGETPOS, 200));
-}
-
-// I might actually need to use a PID to tune the PID
-#[allow(non_snake_case)]
-fn metaTunePID(target: f64, attempts: u64) -> PID {
-    let mut current_PID: PID = PID{P:0.0,I:0.0,D:0.0,attempts:100};
-    let mut last_attempt = current_PID.attempts;
-    let mut P_tune_val = 1.0;
-    let mut I_tune_val = 0.05;
-    let mut _D_tune_val = 0.0;
-    for _ in 0..attempts {
-        current_PID.P += P_tune_val;
-        let result = tunePID(&current_PID, target, 200);
-        if result.attempts > last_attempt {
-            current_PID.P -= P_tune_val;
-            P_tune_val /= 10.0;
-        }
-        current_PID.I += I_tune_val;
-        let result = tunePID(&current_PID, target, 200);
-        if result.attempts > last_attempt {
-            current_PID.I -= I_tune_val;
-            I_tune_val /= 10.0;
-        }
-        let result = tunePID(&current_PID, target, 100);
-        last_attempt = result.attempts;
-        // Just ignore D for now
-    }
-    current_PID.attempts = last_attempt;
-    current_PID
+    println!("Tuned PID: {:?}", tunePID(&PID{P:0.0,I:0.0,D:0.0,attempts:100}, TARGETPOS, 200));
 }
 
 // I might actually need to use a PID to tune the PID
@@ -83,6 +53,11 @@ fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
             current_PID.P -= P_tune_val;
             P_tune_val /= 10.0;
         }
+        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        last_attempt = result;
+        // Just ignore D for now
+    }
+    for _ in 0..attempts {
         current_PID.I += I_tune_val;
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
         if result > last_attempt {
@@ -91,8 +66,8 @@ fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
         }
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
         last_attempt = result;
-        // Just ignore D for now
     }
+    // Just ignore D for now
     current_PID.attempts = last_attempt;
     current_PID
 }
