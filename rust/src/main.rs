@@ -45,7 +45,7 @@ fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
     let mut last_attempt = best_PID.attempts;
     let mut P_tune_val = 1.0;
     let mut I_tune_val = 0.05;
-    let mut _D_tune_val = 0.0;
+    let mut D_tune_val = 0.001;
     for _ in 0..attempts {
         current_PID.P += P_tune_val;
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
@@ -67,7 +67,16 @@ fn tunePID(best_PID: &PID, target: f64, attempts: u64) -> PID {
         let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
         last_attempt = result;
     }
-    // Just ignore D for now
+    for _ in 0..attempts {
+        current_PID.D += D_tune_val;
+        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        if result > last_attempt {
+            current_PID.D -= D_tune_val;
+            D_tune_val /= 10.0;
+        }
+        let result = simulate_attempts(&current_PID, target, |pos, calc| {pos+calc/10.0}, 100);
+        last_attempt = result;
+    }
     current_PID.attempts = last_attempt;
     current_PID
 }
