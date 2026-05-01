@@ -1,7 +1,8 @@
 use std::time::Duration;
 
 // Default would be nice but would give a period of 0
-// #[Derive(Default)]
+// #[derive(Default)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct PIDController {
     kp: f64,
     ki: f64,
