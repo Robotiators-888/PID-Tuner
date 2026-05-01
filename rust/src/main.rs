@@ -9,7 +9,7 @@ use std::{
 
 use pid::{
     controller::PIDController,
-    tuner::{PID, tunePID},
+    tuner::{tunePID, PID},
 };
 
 const TARGETPOS: f64 = 10.0;
@@ -50,6 +50,7 @@ fn main() {
     println!(
         "Tuned PID: {:?}",
         tunePID(
+            // This is so cursed
             &PID {
                 P: 0.0,
                 I: 0.0,
