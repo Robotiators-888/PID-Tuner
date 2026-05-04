@@ -23,9 +23,9 @@ fn main() {
         .map(|n| n.get())
         .unwrap_or(1_usize); // Super idiomatic _usize
     let _pid: Arc<Mutex<PID>> = Arc::new(Mutex::new(PID {
-        P: P,
-        I: I,
-        D: D,
+        P,
+        I,
+        D,
         attempts: 0,
     }));
     let stdout = io::stdout().lock();

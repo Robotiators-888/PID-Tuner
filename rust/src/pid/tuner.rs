@@ -67,6 +67,7 @@ pub fn simulate_attempts(
 }
 
 #[allow(non_snake_case)]
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct PID {
     pub P: f64,
